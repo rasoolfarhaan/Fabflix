@@ -21,7 +21,7 @@ function handleStarResult(resultData) {
     let starTableBodyElement = jQuery("#star_table_body");
 
     // Iterate through resultData, no more than 10 entriesye
-    for (let i = 0; i < Math.min(10, resultData.length); i++) {
+    for (let i = 0; i < Math.min(20, resultData.length); i++) {
 
         // Concatenate the html tags with resultData jsonObject
         let rowHTML = "";
