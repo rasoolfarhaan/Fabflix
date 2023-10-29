@@ -1,32 +1,65 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const loginForm = document.querySelector("form");
+/**
+ * Retrieve parameter from request URL, matching by parameter name
+ * @param target String
+ * @returns {*}
+ */
+function getParameterByName(target) {
+    // Get request URL
+    let url = window.location.href;
+    // Encode target parameter name to URL encoding
+    target = target.replace(/[\[\]]/g, "\\$&");
 
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent the form from submitting via the default action
+    // Use a regular expression to find matched parameter value
+    let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
 
-        const email = document.querySelector("input[name=email]").value;
-        const password = document.querySelector("input[name=password]").value;
+    // Return the decoded parameter value
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
-        // Perform an AJAX request to your server to check the login credentials
-        // Replace 'your-api-endpoint' with the actual endpoint that handles the login
-        fetch("/api/movies", {
-            method: "POST",
-            body: JSON.stringify({ email, password }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-                if (response.ok) {
-                    // If the login was successful, redirect to the movie list page
-                    window.location.href = "movies.html"; // Replace with the actual URL
-                } else {
-                    alert("Login failed. Please check your credentials.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("An error occurred while logging in.");
-            });
+/**
+ * Handles the data returned by the API, read the jsonObject and populate data into HTML elements
+ * @param resultData jsonObject
+ */
+function handleResult(resultData) {
+    if (resultData && resultData.error) {
+        // Check if the resultData contains an "error" property
+        // This indicates an error response from the servlet
+        alert(resultData.error); // Display the error message in a popup
+    }
+}
+
+/**
+ * Once this .js is loaded, following scripts will be executed by the browser
+ */
+
+// Get id from URL
+let starId = getParameterByName('id');
+
+// Handles the form submission
+$('form').submit(function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Serialize the form data to send it as POST data
+    let formData = $(this).serialize();
+
+    // Makes the HTTP POST request and registers success and error callback functions
+    $.ajax({
+        dataType: "json",  // Setting return data type
+        method: "POST", // Setting request method
+        url: "form", // Setting request URL, which is mapped by FormServlet in your Java code
+        data: formData, // Send the form data
+        success: (resultData) => handleResult(resultData), // Success callback
+        error: function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 401) {
+                // Handle a 401 error (Unauthorized) by showing an error message
+                alert("Invalid username or password");
+            } else {
+                // Handle other errors as needed
+                window.location.href='movie-list.html';
+            }
+        }
     });
 });

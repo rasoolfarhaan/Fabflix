@@ -59,7 +59,8 @@ public class FormServlet extends HttpServlet {
 
             if (rs.next()) {
                 // Successful login, redirect to the movie-list page
-                request.setAttribute("email", username);
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                request.getSession().setAttribute("email", username);
                 response.sendRedirect("movies"); // You can adjust the URL as needed
             } else {
                 // Invalid login, return an error message
@@ -75,19 +76,9 @@ public class FormServlet extends HttpServlet {
 
 
         } catch (Exception e) {
-            /*
-             * After you deploy the WAR file through tomcat manager webpage,
-             *   there's no console to see the print messages.
-             * Tomcat append all the print messages to the file: tomcat_directory/logs/catalina.out
-             *
-             * To view the last n lines (for example, 100 lines) of messages you can use:
-             *   tail -100 catalina.out
-             * This can help you debug your program after deploying it on AWS.
-             */
             request.getServletContext().log("Error: ", e);
 
-            // Output Error Massage to html
-            out.println(String.format("<html><head><title>MovieDBExample: EEEError</title></head>\n<body><p>SQL error in doGet: %s</p></body></html>", e.getMessage()));
+            out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doGet: %s</p></body></html>", e.getMessage()));
             return;
         }
         out.close();
