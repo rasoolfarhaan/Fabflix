@@ -42,4 +42,13 @@
         <servlet-name>FormServlet</servlet-name>
         <url-pattern>/form</url-pattern> <!-- Specify the URL pattern that will trigger your servlet -->
     </servlet-mapping>
+
+<!--    <servlet>-->
+<!--        <servlet-name>MovieListServlet</servlet-name>-->
+<!--    </servlet>-->
+
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>MovieListServlet</servlet-name>-->
+<!--        <url-pattern>/api/movies</url-pattern>-->
+<!--    </servlet-mapping>-->
 </web-app>
