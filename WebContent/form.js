@@ -58,7 +58,7 @@ $('form').submit(function(event) {
                 alert("Invalid username or password");
             } else {
                 // Handle other errors as needed
-                window.location.href='movie-list.html';
+                window.location.href='main.html';
             }
         }
     });

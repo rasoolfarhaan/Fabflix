@@ -42,39 +42,65 @@ public class MovieListServlet extends HttpServlet {
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
 
-        // Get a connection from dataSource and let resource manager close the connection after usage.
+        // Get a connection from dataSource and let the resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()) {
-
-            // Declare our statement
             Statement statement = conn.createStatement();
+            String title = request.getParameter("title");
+            String year = request.getParameter("year");
+            String director = request.getParameter("director");
+            String star = request.getParameter("star");
+            String genre = request.getParameter("genre");
+            String titleStartsWith = request.getParameter("titleStartsWith");
 
-            String query = "SELECT\n" +
-                    "    CONCAT('<a href=\\\"single-movie.html?id=', m.id, '\\\">', m.title, '</a>') AS title,\n" +
-                    "    m.year AS year,\n" +
-                    "    m.director AS director,\n" +
-                    "    GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC) AS genres,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC) AS stars,\n" +
-                    "    r.rating AS rating\n" +
-                    "FROM\n" +
-                    "    movies m\n" +
-                    "JOIN\n" +
-                    "    genres_in_movies gm ON m.id = gm.movieId\n" +
-                    "JOIN\n" +
-                    "    genres g ON gm.genreId = g.id\n" +
-                    "LEFT JOIN\n" +
-                    "    stars_in_movies sm ON m.id = sm.movieId\n" +
-                    "LEFT JOIN\n" +
-                    "    stars s ON sm.starId = s.id\n" +
-                    "JOIN\n" +
-                    "    ratings r ON m.id = r.movieId\n" +
-                    "GROUP BY\n" +
-                    "    m.id\n" +
-                    "ORDER BY\n" +
-                    "    r.rating DESC\n" +
-                    "LIMIT 20;";
+            String sqlQuery = "SELECT " +
+                    "CONCAT('<a href=\"single-movie.html?id=', m.id, '\">', m.title, '</a>') AS title, " +
+                    "m.year AS year, " +
+                    "m.director AS director, " +
+                    "GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC) AS genres, " +
+                    "GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC) AS stars, " +
+                    "r.rating AS rating " +
+                    "FROM " +
+                    "movies m " +
+                    "JOIN " +
+                    "genres_in_movies gm ON m.id = gm.movieId " +
+                    "JOIN " +
+                    "genres g ON gm.genreId = g.id " +
+                    "LEFT JOIN " +
+                    "stars_in_movies sm ON m.id = sm.movieId " +
+                    "LEFT JOIN " +
+                    "stars s ON sm.starId = s.id " +
+                    "JOIN " +
+                    "ratings r ON m.id = r.movieId " +
+                    "WHERE 1=1"; // Placeholder for conditions
+
+// Add conditions based on query parameters
+            if (title != null && !title.isEmpty()) {
+                sqlQuery += " AND m.title LIKE '%" + title + "%'";
+            }
+            if (year != null && !year.isEmpty()) {
+                sqlQuery += " AND m.year = " + year;
+            }
+            if (director != null && !director.isEmpty()) {
+                sqlQuery += " AND m.director LIKE '%" + director + "%'";
+            }
+            if (star != null && !star.isEmpty()) {
+                sqlQuery += " AND s.name LIKE '%" + star + "%'";
+            }
+            if (genre != null && !genre.isEmpty()) {
+                sqlQuery += " AND g.name = '" + genre + "'";
+            }
+            if (titleStartsWith != null && !titleStartsWith.isEmpty()) {
+                if (titleStartsWith.equals("*")) {
+                    sqlQuery += " AND m.title REGEXP '^[^a-zA-Z0-9]'";
+                } else {
+                    sqlQuery += " AND m.title LIKE '" + titleStartsWith + "%'";
+                }
+            }
+
+            sqlQuery += " GROUP BY m.id LIMIT 20;";
 
             // Perform the query
-            ResultSet rs = statement.executeQuery(query);
+            ResultSet rs = statement.executeQuery(sqlQuery);
 
             JsonArray jsonArray = new JsonArray();
 
@@ -121,8 +147,5 @@ public class MovieListServlet extends HttpServlet {
         } finally {
             out.close();
         }
-
-        // Always remember to close db connection after usage. Here it's done by try-with-resources
-
     }
 }
