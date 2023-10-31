@@ -22,6 +22,8 @@ $(document).ready(function () {
                 console.error("Error adding movie to cart: " + movieId);
             }
         });
+        alert("SUCCESS");
+        location.reload();
     });
 });
 
@@ -48,9 +50,9 @@ function loadShoppingCart() {
                 rowHTML += "<td>$" + price + "</td>"; // Use the actual price
                 rowHTML += "<td>$" + (quantity * price) + "</td>";
                 rowHTML += "    <td>\n" +
-                    '        <button class="add-to-cart" data-movie-title="' + movieTitle + '">+</button>' +
-                    "        <button class=\"add-to-cart\" data-movie-title=\"" + movieTitle + "\" data-decrease=\"true\">-</button>" +
-                    "        <button class=\"add-to-cart\" data-movie-title=\"" + movieTitle + "\" data-delete=\"true\">delete</button>" +
+                    '        <button id="success" class="add-to-cart" data-movie-title="' + movieTitle + '">+</button>' +
+                    "        <button id=\"success\" class=\"add-to-cart\" data-movie-title=\"" + movieTitle + "\" data-decrease=\"true\">-</button>" +
+                    "        <button id=\"success\" class=\"add-to-cart\" data-movie-title=\"" + movieTitle + "\" data-delete=\"true\">delete</button>" +
                     "    </td>";
                 rowHTML += "</tr>";
 

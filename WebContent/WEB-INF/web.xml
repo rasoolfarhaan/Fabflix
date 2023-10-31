@@ -43,6 +43,18 @@
         <url-pattern>/form</url-pattern> <!-- Specify the URL pattern that will trigger your servlet -->
     </servlet-mapping>
 
+    <!-- Define servlet -->
+    <servlet>
+        <servlet-name>PlaceOrderServlet</servlet-name>
+        <servlet-class>PlaceOrderServlet</servlet-class> <!-- Specify the fully-qualified class name of your servlet -->
+    </servlet>
+
+    <!-- Map your servlet to a URL pattern -->
+    <servlet-mapping>
+        <servlet-name>PlaceOrderServlet</servlet-name>
+        <url-pattern>/pay</url-pattern> <!-- Specify the URL pattern that will trigger your servlet -->
+    </servlet-mapping>
+
 <!--    <servlet>-->
 <!--        <servlet-name>MovieListServlet</servlet-name>-->
 <!--    </servlet>-->
