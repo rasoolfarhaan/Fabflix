@@ -73,7 +73,7 @@ public class MovieListServlet extends HttpServlet {
                     "ratings r ON m.id = r.movieId " +
                     "WHERE 1=1"; // Placeholder for conditions
 
-// Add conditions based on query parameters
+            // Add conditions based on query parameters
             if (title != null && !title.isEmpty()) {
                 sqlQuery += " AND m.title LIKE '%" + title + "%'";
             }

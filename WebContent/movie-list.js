@@ -17,13 +17,9 @@ function handleStarResult(resultData) {
     console.log("handleStarResult: populating star table from resultData");
 
     // Populate the star table
-    // Find the empty table body by id "star_table_body"
     let starTableBodyElement = jQuery("#star_table_body");
 
-    // Iterate through resultData, no more than 10 entriesye
     for (let i = 0; i < Math.min(20, resultData.length); i++) {
-
-        // Concatenate the html tags with resultData jsonObject
         let rowHTML = "";
         rowHTML += "<tr>";
         rowHTML += "<th>" + resultData[i]["movie_title"] + "</th>";
@@ -32,12 +28,36 @@ function handleStarResult(resultData) {
         rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
         rowHTML += "<th>" + resultData[i]["movie_stars"] + "</th>";
         rowHTML += "<th>" + resultData[i]["movie_rating"] + "</th>";
-        rowHTML += "</tr>";
 
-        // Append the row created to the table body, which will refresh the page
+        // Add the "Add to Cart" button with a data-movie-id attribute to store the movie ID
+        rowHTML += '<th><button class="add-to-cart" data-movie-title="' + resultData[i]["movie_title"].substring(30) + '">Add to Cart</button></th>';
+
+        rowHTML += "</tr>";
         starTableBodyElement.append(rowHTML);
     }
+
+    // Attach a click event handler to the "Add to Cart" buttons
+    jQuery(".add-to-cart").click(function () {
+        const movieId = jQuery(this).data("movie-title");
+
+        // Send an AJAX request to add the selected movie to the cart
+        jQuery.ajax({
+            method: "POST",  // You can use POST or another HTTP method
+            url: "AddToCartServlet?movieId=" + movieId + "&decrease=n&delete=n", // Replace with the actual URL to your Servlet
+            data: { movieId: movieId },
+            success: function (response) {
+                // Handle the response from the server, if needed
+                console.log("Movie added to cart: " + movieId);
+            },
+            error: function (error) {
+                // Handle any errors, if needed
+                console.error("Error adding movie to cart: " + movieId);
+            }
+        });
+    });
+
 }
+
 
 
 /**

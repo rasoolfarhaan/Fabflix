@@ -59,6 +59,7 @@ public class FormServlet extends HttpServlet {
 
             if (rs.next()) {
                 // Successful login, redirect to the movie-list page
+                request.getSession().setAttribute("cart", new ShoppingCart());
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 request.getSession().setAttribute("email", username);
                 response.sendRedirect("movies"); // You can adjust the URL as needed
