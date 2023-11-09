@@ -14,20 +14,40 @@
  * @param resultData jsonObject
  */
 function handleStarResult(resultData) {
+    console.log(resultData);
     console.log("handleStarResult: populating star table from resultData");
 
     // Populate the star table
     let starTableBodyElement = jQuery("#star_table_body");
 
     for (let i = 0; i < Math.min(20, resultData.length); i++) {
-        let rowHTML = "";
-        rowHTML += "<tr>";
-        rowHTML += "<th>" + resultData[i]["movie_title"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_year"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_director"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_stars"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_rating"] + "</th>";
+
+        let rowHTML = `
+        <tr>
+        <th><a href="single-movie.html?id=${resultData[i]["movie_id"]}">${resultData[i]["movie_title"]}</a></th>
+        <th>${resultData[i]["movie_year"]}</th>
+        <th>${resultData[i]["movie_director"]}</th>
+        <th>
+        <ul>
+            ${resultData[i]["movie_genres"].map(genre =>
+                    `<li><a href="movie-list.html?genre=${genre}">${genre}</a></li>`
+                ).join("")}
+          </ul>
+        </th>
+        <th>
+          <ul>
+            ${resultData[i]["movie_stars"].map(star => {
+                
+                const splitResult = star.split("@")
+                console.log(splitResult)
+                const starName = splitResult[0];
+                const starId = splitResult[1];
+                return `<li><a href="single-star.html?id=${starId}">${starName}</a></li>`
+            }
+                ).join("")}
+          </ul>
+        </th>
+        <th>${resultData[i]["movie_rating"]}</th>`
 
         // Add the "Add to Cart" button with a data-movie-id attribute to store the movie ID
         rowHTML += '<th><button class="add-to-cart" data-movie-title="' + resultData[i]["movie_title"].substring(30) + '">Add to Cart</button></th>';

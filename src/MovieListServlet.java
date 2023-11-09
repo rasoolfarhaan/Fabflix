@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,6 +39,7 @@ public class MovieListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         response.setContentType("application/json"); // Response mime type
+        HttpSession session = request.getSession();
 
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
@@ -51,27 +53,33 @@ public class MovieListServlet extends HttpServlet {
             String star = request.getParameter("star");
             String genre = request.getParameter("genre");
             String titleStartsWith = request.getParameter("titleStartsWith");
+            String sorting = request.getParameter("sorting");
 
-            String sqlQuery = "SELECT " +
-                    "CONCAT('<a href=\"single-movie.html?id=', m.id, '\">', m.title, '</a>') AS title, " +
-                    "m.year AS year, " +
-                    "m.director AS director, " +
-                    "GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC) AS genres, " +
-                    "GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC) AS stars, " +
-                    "r.rating AS rating " +
-                    "FROM " +
-                    "movies m " +
-                    "JOIN " +
-                    "genres_in_movies gm ON m.id = gm.movieId " +
-                    "JOIN " +
-                    "genres g ON gm.genreId = g.id " +
-                    "LEFT JOIN " +
-                    "stars_in_movies sm ON m.id = sm.movieId " +
-                    "LEFT JOIN " +
-                    "stars s ON sm.starId = s.id " +
-                    "JOIN " +
-                    "ratings r ON m.id = r.movieId " +
-                    "WHERE 1=1"; // Placeholder for conditions
+            String sqlQuery = "SELECT \n" +
+                    "m.id AS id, \n" +
+                    "m.title AS title, \n" +
+                    "m.year AS year, \n" +
+                    "m.director AS director, \n" +
+                    "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC) \n" +
+                    " FROM genres g \n" +
+                    " INNER JOIN genres_in_movies gim ON g.id = gim.genreId \n" +
+                    " WHERE gim.movieId = m.id \n" +
+                    " LIMIT 3) AS genres, \n" +
+                    "(SELECT GROUP_CONCAT(concat(s.name,'@',s.id) ORDER BY movieCount DESC, s.name ASC) \n" +
+                    " FROM (SELECT stars.id, stars.name, COUNT(sm.movieId) AS movieCount \n" +
+                    "       FROM stars \n" +
+                    "       INNER JOIN stars_in_movies sm ON stars.id = sm.starId \n" +
+                    "       WHERE sm.movieId = m.id \n" +
+                    "       GROUP BY stars.id, stars.name \n" +
+                    "       ORDER BY movieCount DESC, stars.name ASC \n" +
+                    "       LIMIT 3) AS s) AS stars, \n" +
+                    "COALESCE(r.rating, 'N/A') AS rating \n"+
+                    "FROM movies m \n" +
+                    "LEFT JOIN ratings r ON m.id = r.movieId \n" +
+                    "INNER JOIN genres_in_movies gim ON m.id = gim.movieId\n" +
+                    "INNER JOIN genres g ON gim.genreId = g.id\n"+
+                    "WHERE 1 = 1 ";
+
 
             // Add conditions based on query parameters
             if (title != null && !title.isEmpty()) {
@@ -87,7 +95,7 @@ public class MovieListServlet extends HttpServlet {
                 sqlQuery += " AND s.name LIKE '%" + star + "%'";
             }
             if (genre != null && !genre.isEmpty()) {
-                sqlQuery += " AND g.name = '" + genre + "'";
+                sqlQuery += " AND g.name like '%" + genre + "%'";
             }
             if (titleStartsWith != null && !titleStartsWith.isEmpty()) {
                 if (titleStartsWith.equals("*")) {
@@ -96,8 +104,39 @@ public class MovieListServlet extends HttpServlet {
                     sqlQuery += " AND m.title LIKE '" + titleStartsWith + "%'";
                 }
             }
-
+            if (sorting != null && !sorting.isEmpty()) {
+                switch (sorting) {
+                    case "titleAscRatingAsc":
+                        sqlQuery += " ORDER BY m.title ASC, rating ASC";
+                        break;
+                    case "titleAscRatingDesc":
+                        sqlQuery += " ORDER BY m.title ASC, rating DESC";
+                        break;
+                    case "titleDescRatingAsc":
+                        sqlQuery += " ORDER BY m.title DESC, rating ASC";
+                        break;
+                    case "titleDescRatingDesc":
+                        sqlQuery += " ORDER BY m.title DESC, rating DESC";
+                        break;
+                    case "ratingAscTitleAsc":
+                        sqlQuery += " ORDER BY rating ASC, m.title ASC";
+                        break;
+                    case "ratingAscTitleDesc":
+                        sqlQuery += " ORDER BY rating ASC, m.title DESC";
+                        break;
+                    case "ratingDescTitleAsc":
+                        sqlQuery += " ORDER BY rating DESC, m.title ASC";
+                        break;
+                    case "ratingDescTitleDesc":
+                        sqlQuery += " ORDER BY rating DESC, m.title DESC";
+                        break;
+                    default:
+                        // Default sorting
+                        sqlQuery += " ORDER BY m.title ASC, rating ASC";
+                }
+            }
             sqlQuery += " GROUP BY m.id LIMIT 20;";
+            System.out.println(sqlQuery);
 
             // Perform the query
             ResultSet rs = statement.executeQuery(sqlQuery);
@@ -106,6 +145,7 @@ public class MovieListServlet extends HttpServlet {
 
             // Iterate through each row of rs
             while (rs.next()) {
+                String movie_id = rs.getString("id");
                 String movie_title = rs.getString("title");
                 String movie_year = rs.getString("year");
                 String movie_director = rs.getString("director");
@@ -115,11 +155,29 @@ public class MovieListServlet extends HttpServlet {
 
                 // Create a JsonObject based on the data we retrieve from rs
                 JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("movie_id", movie_id);
                 jsonObject.addProperty("movie_title", movie_title);
                 jsonObject.addProperty("movie_year", movie_year);
                 jsonObject.addProperty("movie_director", movie_director);
-                jsonObject.addProperty("movie_genres", movie_genres);
-                jsonObject.addProperty("movie_stars", movie_stars);
+                String[] genres = rs.getString("genres").split(",");
+                JsonArray jsonGenres = new JsonArray();
+                for (int i = 0; i < genres.length; i++) {
+                    if (i >= 3) {
+                        break;
+                    }
+                    jsonGenres.add(genres[i]);
+                }
+                jsonObject.add("movie_genres", jsonGenres);
+                String[] stars = rs.getString("stars").split(",");
+                JsonArray jsonStars = new JsonArray();
+                for (int i = 0; i < stars.length; i++) {
+                    if (i >= 3) {
+                        break;
+                    }
+                    jsonStars.add(stars[i]);
+                }
+                jsonObject.add("movie_stars", jsonStars);
+
                 jsonObject.addProperty("movie_rating", movie_rating);
 
                 jsonArray.add(jsonObject);

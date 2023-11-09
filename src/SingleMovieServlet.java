@@ -57,7 +57,7 @@ public class SingleMovieServlet extends HttpServlet {
                     "    m.title AS title,\n" +
                     "    m.year AS year,\n" +
                     "    m.director AS director,\n" +
-                    "    GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC) AS genres,\n" +
+                    "    GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) AS genres,\n" +
                     "    GROUP_CONCAT(DISTINCT CONCAT('<a href=\"single-star.html?id=', s.id, '\">', s.name, '</a>') ORDER BY s.name ASC) AS stars,\n" +
                     "    r.rating AS rating\n" +
                     "FROM\n" +

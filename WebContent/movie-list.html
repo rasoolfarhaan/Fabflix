@@ -20,6 +20,7 @@
     <title>Movie List</title>
 </head>
 <body>
+<!-- Sorting Controls -->
 
 <a href="payment.html">
     <button>Checkout</button>
@@ -27,6 +28,19 @@
 
 
 <h1>movies</h1>
+<label for="sortDropdown">Sort By:</label>
+<select id="sortDropdown" onchange="sortList()">
+    <option value="titleAscRatingAsc">Title (Ascending), Rating (Ascending)</option>
+    <option value="titleAscRatingDesc">Title (Ascending), Rating (Descending)</option>
+    <option value="titleDescRatingAsc">Title (Descending), Rating (Ascending)</option>
+    <option value="titleDescRatingDesc">Title (Descending), Rating (Descending)</option>
+    <option value="ratingAscTitleAsc">Rating (Ascending), Title (Ascending)</option>
+    <option value="ratingAscTitleDesc">Rating (Ascending), Title (Descending)</option>
+    <option value="ratingDescTitleAsc">Rating (Descending), Title (Ascending)</option>
+    <option value="ratingDescTitleDesc">Rating (Descending), Title (Descending)</option>
+</select>
+
+<button onclick="sortList()">Update</button>
 
 <!-- Id "star_table" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
 <table id=star_table class="table table-striped">
