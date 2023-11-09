@@ -184,7 +184,6 @@ public class MovieListServlet extends HttpServlet {
             }
             rs.close();
             statement.close();
-
             // Log to localhost log
             request.getServletContext().log("getting " + jsonArray.size() + " results");
 

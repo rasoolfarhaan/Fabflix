@@ -46,7 +46,7 @@ function handleStarResult(resultData) {
             }
                 ).join("")}
           </ul>
-        </th>
+        </th> 
         <th>${resultData[i]["movie_rating"]}</th>`
 
         // Add the "Add to Cart" button with a data-movie-id attribute to store the movie ID
@@ -75,7 +75,6 @@ function handleStarResult(resultData) {
             }
         });
     });
-
 }
 
 
