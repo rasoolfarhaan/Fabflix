@@ -69,7 +69,9 @@
 
         // Construct the query string with the new sorting parameter
         let queryString = window.location.search.substring(1);
+        // console.log("yerrrrrr" + queryString);
         let newQueryString = updateQueryStringParameter(queryString, "sorting", sortValue);
+        // console.log("yer" + newQueryString);
 
         // Make an AJAX call to the backend with the new query string
         jQuery.ajax({
@@ -86,7 +88,7 @@
             return uri.replace(re, '$1' + key + "=" + value + '$2');
         }
         else {
-            return uri + separator + key + "=" + value;
+            return uri + (uri.indexOf('?') !== -1 ? "&" : "?") + key + "=" + value;
         }
     }
     document.addEventListener('DOMContentLoaded', (event) => {
