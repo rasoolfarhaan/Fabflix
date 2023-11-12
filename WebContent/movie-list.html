@@ -29,7 +29,7 @@
 
 <h1>movies</h1>
 <label for="sortDropdown">Sort By:</label>
-<select id="sortDropdown" onchange="sortList()">
+<select id="sortDropdown">
     <option value="titleAscRatingAsc">Title (Ascending), Rating (Ascending)</option>
     <option value="titleAscRatingDesc">Title (Ascending), Rating (Descending)</option>
     <option value="titleDescRatingAsc">Title (Descending), Rating (Ascending)</option>
@@ -60,6 +60,39 @@
     <!-- Again, id "star_table_body" is useful for jQuery to find this html element -->
     <tbody id=star_table_body></tbody>
 </table>
+
+<script>
+    function sortList() {
+        console.log("sortList function called");
+        // Get the selected sorting option
+        let sortValue = document.getElementById("sortDropdown").value;
+
+        // Construct the query string with the new sorting parameter
+        let queryString = window.location.search.substring(1);
+        let newQueryString = updateQueryStringParameter(queryString, "sorting", sortValue);
+
+        // Make an AJAX call to the backend with the new query string
+        jQuery.ajax({
+            dataType: "json",
+            method: "GET",
+            url: "api/movies?" + newQueryString,
+            success: (resultData) => handleStarResult(resultData)
+        });
+    }
+    function updateQueryStringParameter(uri, key, value) {
+        let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+        let separator = uri.indexOf('?') !== -1 ? "&" : "?";
+        if (uri.match(re)) {
+            return uri.replace(re, '$1' + key + "=" + value + '$2');
+        }
+        else {
+            return uri + separator + key + "=" + value;
+        }
+    }
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.querySelector('button').addEventListener('click', sortList);
+    });
+</script>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

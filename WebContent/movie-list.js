@@ -10,11 +10,16 @@
 
 
 /**
+ * Sorts the movie list based on the selected option from the dropdown.
+ */
+
+
+
+/**
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
  * @param resultData jsonObject
  */
 function handleStarResult(resultData) {
-    console.log(resultData);
     console.log("handleStarResult: populating star table from resultData");
 
     // Populate the star table
