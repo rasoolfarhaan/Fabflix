@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 /**
  * A servlet that takes input from a html <form> and talks to MySQL moviedbexample,
@@ -20,8 +20,6 @@ import java.sql.Statement;
 // Declaring a WebServlet called FormServlet, which maps to url "/form"
 @WebServlet(name = "FormServlet", urlPatterns = "/form")
 public class FormServlet extends HttpServlet {
-
-    // Create a dataSource which registered in web.xml
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -32,56 +30,46 @@ public class FormServlet extends HttpServlet {
         }
     }
 
-    // Use http POST
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        response.setContentType("application/json");    // Response mime type
-
-        // Output stream to STDOUT
+        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
+        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+
         try {
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+        } catch (Exception e) {
+            response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
+            return;
+        }
 
-            // Create a new connection to database
-            Connection dbCon = dataSource.getConnection();
-
-            // Declare a new statement
-            Statement statement = dbCon.createStatement();
-
-            // Retrieve parameter "name" from the http request, which refers to the value of <input name="name"> in index.html
-            String username = request.getParameter("email");
+        try(Connection dbCon = dataSource.getConnection()) {
+            String email = request.getParameter("email");
             String password = request.getParameter("password");
 
-            // Assuming you have a table named 'customers' in your database
-            String query = "SELECT * FROM customers WHERE email = '" + username + "' AND password = '" + password + "'";
+            String query = "SELECT * FROM customers WHERE email = ? AND password = ?";
 
-            ResultSet rs = statement.executeQuery(query);
+            PreparedStatement preparedStatement = dbCon.prepareStatement(query);
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
+
+            ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
-                // Successful login, redirect to the movie-list page
                 request.getSession().setAttribute("cart", new ShoppingCart());
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                request.getSession().setAttribute("email", username);
-                response.sendRedirect("movies"); // You can adjust the URL as needed
+                request.getSession().setAttribute("email", email);
             } else {
-                // Invalid login, return an error message
                 response.setContentType("application/json");
                 response.getWriter().write("{ \"error\": \"Invalid username or password\" }");
             }
 
-            // Close all structures
             rs.close();
-            statement.close();
-            dbCon.close();
-
-
-
         } catch (Exception e) {
             request.getServletContext().log("Error: ", e);
-
             out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doGet: %s</p></body></html>", e.getMessage()));
-            return;
+        } finally {
+            out.close();
         }
-        out.close();
     }
 }
