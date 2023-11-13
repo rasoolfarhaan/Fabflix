@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 
 /**
  * A servlet that takes input from a html <form> and talks to MySQL moviedbexample,
@@ -47,11 +48,13 @@ public class FormServlet extends HttpServlet {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
 
+            String encryptedPassword = new StrongPasswordEncryptor().encryptPassword(password);
+
             String query = "SELECT * FROM customers WHERE email = ? AND password = ?";
 
             PreparedStatement preparedStatement = dbCon.prepareStatement(query);
             preparedStatement.setString(1, email);
-            preparedStatement.setString(2, password);
+            preparedStatement.setString(2, encryptedPassword);
 
             ResultSet rs = preparedStatement.executeQuery();
 
