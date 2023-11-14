@@ -19,8 +19,8 @@ import org.jasypt.util.password.StrongPasswordEncryptor;
  */
 
 // Declaring a WebServlet called FormServlet, which maps to url "/form"
-@WebServlet(name = "FormServlet", urlPatterns = "/form")
-public class FormServlet extends HttpServlet {
+@WebServlet(name = "EmployeeFormServlet", urlPatterns = "/employeeForm")
+public class EmployeeFormServlet extends HttpServlet {
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -48,7 +48,7 @@ public class FormServlet extends HttpServlet {
             String email = request.getParameter("email");
             String input = request.getParameter("password");
 
-            String query = "SELECT customer.password FROM customers as customer WHERE customer.email = ?";
+            String query = "SELECT employee.password FROM employees as employee WHERE employee.email = ?";
 
             PreparedStatement preparedStatement = dbCon.prepareStatement(query);
             preparedStatement.setString(1, email);

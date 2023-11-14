@@ -45,6 +45,18 @@
 
     <!-- Define servlet -->
     <servlet>
+        <servlet-name>EmployeeFormServlet</servlet-name>
+        <servlet-class>FormServlet</servlet-class> <!-- Specify the fully-qualified class name of your servlet -->
+    </servlet>
+
+    <!-- Map your servlet to a URL pattern -->
+    <servlet-mapping>
+        <servlet-name>EmployeeFormServlet</servlet-name>
+        <url-pattern>/employeeForm</url-pattern> <!-- Specify the URL pattern that will trigger your servlet -->
+    </servlet-mapping>
+
+    <!-- Define servlet -->
+    <servlet>
         <servlet-name>PlaceOrderServlet</servlet-name>
         <servlet-class>PlaceOrderServlet</servlet-class> <!-- Specify the fully-qualified class name of your servlet -->
     </servlet>
@@ -63,13 +75,13 @@
 <!--        <servlet-name>MovieListServlet</servlet-name>-->
 <!--        <url-pattern>/api/movies</url-pattern>-->
 <!--    </servlet-mapping>-->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>HTTPSOnly</web-resource-name>
-            <url-pattern>/*</url-pattern>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
+<!--    <security-constraint>-->
+<!--        <web-resource-collection>-->
+<!--            <web-resource-name>HTTPSOnly</web-resource-name>-->
+<!--            <url-pattern>/*</url-pattern>-->
+<!--        </web-resource-collection>-->
+<!--        <user-data-constraint>-->
+<!--            <transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
+<!--        </user-data-constraint>-->
+<!--    </security-constraint>-->
 </web-app>

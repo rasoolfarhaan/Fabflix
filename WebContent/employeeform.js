@@ -12,7 +12,7 @@ $('form').submit(function(event) {
     $.ajax({
         dataType: "json",  // Setting return data type
         method: "POST", // Setting request method
-        url: "form", // Setting request URL, which is mapped by FormServlet in your Java code
+        url: "employeeform", // Setting request URL, which is mapped by FormServlet in your Java code
         data: formData, // Send the form data
         success: (resultData) => handleResult(resultData), // Success callback
         error: function (xhr, textStatus, errorThrown) {
@@ -21,7 +21,7 @@ $('form').submit(function(event) {
                 alert("Invalid username or password!");
             } else {
                 // Handle other errors as needed
-                window.location.href='main.html';
+                window.location.href='dashboard.html';
             }
         }
     });
