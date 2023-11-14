@@ -35,30 +35,32 @@ public class FormServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-        } catch (Exception e) {
-            response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
-            return;
-        }
+//        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+//
+//        try {
+//            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//        } catch (Exception e) {
+//            response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
+//            return;
+//        }
 
         try(Connection dbCon = dataSource.getConnection()) {
             String email = request.getParameter("email");
-            String password = request.getParameter("password");
+            String input = request.getParameter("password");
 
-            String encryptedPassword = new StrongPasswordEncryptor().encryptPassword(password);
+//            String encryptedPassword = new StrongPasswordEncryptor().encryptPassword(input);
 
-            String query = "SELECT * FROM customers WHERE email = ? AND password = ?";
+            String query = "SELECT customer.password FROM customers as customer WHERE customer.email = ?";
 
             PreparedStatement preparedStatement = dbCon.prepareStatement(query);
             preparedStatement.setString(1, email);
-            preparedStatement.setString(2, encryptedPassword);
+//            preparedStatement.setString(2, encryptedPassword);
 
             ResultSet rs = preparedStatement.executeQuery();
-
-            if (rs.next()) {
+            rs.next();
+            String password = rs.getString("password");
+            boolean success = new StrongPasswordEncryptor().checkPassword(input, password);
+            if (success) {
                 request.getSession().setAttribute("cart", new ShoppingCart());
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 request.getSession().setAttribute("email", email);
