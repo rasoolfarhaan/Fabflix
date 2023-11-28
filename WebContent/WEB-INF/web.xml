@@ -26,8 +26,8 @@
 <!--        <url-pattern>/movies</url-pattern> &lt;!&ndash; Apply the filter to all requests &ndash;&gt;-->
         <url-pattern>/session</url-pattern> <!-- Apply the filter to all requests -->
 <!--        <url-pattern>/movie-list.html</url-pattern> &lt;!&ndash; Apply the filter to all requests &ndash;&gt;-->
-        <url-pattern>/single-movie.html</url-pattern> <!-- Apply the filter to all requests -->
-        <url-pattern>/single-star.html</url-pattern> <!-- Apply the filter to all requests -->
+<!--        <url-pattern>/single-movie.html</url-pattern> &lt;!&ndash; Apply the filter to all requests &ndash;&gt;-->
+<!--        <url-pattern>/single-star.html</url-pattern> &lt;!&ndash; Apply the filter to all requests &ndash;&gt;-->
     </filter-mapping>
 
 
