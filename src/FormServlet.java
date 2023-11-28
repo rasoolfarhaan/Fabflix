@@ -38,12 +38,12 @@ public class FormServlet extends HttpServlet {
         if(request.getParameter("mobile") == null) {
             String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
 
-            try {
-                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-            } catch (Exception e) {
-                response.getWriter().write("{ \"error\": \"Invalid Captcha!\" }");
-                return;
-            }
+//            try {
+//                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//            } catch (Exception e) {
+//                response.getWriter().write("{ \"error\": \"Invalid Captcha!\" }");
+//                return;
+//            }
         }
 
         try(Connection dbCon = dataSource.getConnection()) {
