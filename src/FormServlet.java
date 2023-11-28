@@ -41,7 +41,7 @@ public class FormServlet extends HttpServlet {
             try {
                 RecaptchaVerifyUtils.verify(gRecaptchaResponse);
             } catch (Exception e) {
-                response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
+                response.getWriter().write("{ \"error\": \"Invalid Captcha!\" }");
                 return;
             }
         }
@@ -63,10 +63,12 @@ public class FormServlet extends HttpServlet {
                 request.getSession().setAttribute("cart", new ShoppingCart());
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 request.getSession().setAttribute("email", email);
-                if(request.getParameter("mobile") != null)
+                if(request.getParameter("mobile") != null) {
                     out.println("{\"status\":\"true\"}");
+                }
             } else {
                 response.setContentType("application/json");
+
                 response.getWriter().write("{ \"error\": \"Invalid username or password.\" }");
             }
 
