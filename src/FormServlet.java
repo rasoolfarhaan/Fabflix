@@ -35,13 +35,15 @@ public class FormServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        if(request.getParameter("mobile") == null) {
+            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
 
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-        } catch (Exception e) {
-            response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
-            return;
+            try {
+                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            } catch (Exception e) {
+                response.getWriter().write("{ \"error\": \"Invalid Captcha\" }");
+                return;
+            }
         }
 
         try(Connection dbCon = dataSource.getConnection()) {
@@ -61,6 +63,8 @@ public class FormServlet extends HttpServlet {
                 request.getSession().setAttribute("cart", new ShoppingCart());
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 request.getSession().setAttribute("email", email);
+                if(request.getParameter("mobile") != null)
+                    out.println("{\"status\":\"true\"}");
             } else {
                 response.setContentType("application/json");
                 response.getWriter().write("{ \"error\": \"Invalid username or password.\" }");
@@ -69,7 +73,7 @@ public class FormServlet extends HttpServlet {
             rs.close();
         } catch (Exception e) {
             request.getServletContext().log("Error: ", e);
-            out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doGet: %s</p></body></html>", e.getMessage()));
+            out.println(String.format("{\"status\":\"\", \"error\":\"error\", \"message\":\"%s\"}", e.getMessage()));
         } finally {
             out.close();
         }
