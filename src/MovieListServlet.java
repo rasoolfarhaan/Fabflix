@@ -39,7 +39,7 @@ public class MovieListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         response.setContentType("application/json"); // Response mime type
-        HttpSession session = request.getSession();
+        HttpSession session =    request.getSession();
 
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
@@ -135,7 +135,7 @@ public class MovieListServlet extends HttpServlet {
                         sqlQuery += " ORDER BY m.title ASC, rating ASC";
                 }
             }
-            sqlQuery += " GROUP BY m.id LIMIT 20;";
+            sqlQuery += " GROUP BY m.id  ORDER BY m.title ASC, rating ASC LIMIT 20;";
             System.out.println(sqlQuery);
 
             // Perform the query

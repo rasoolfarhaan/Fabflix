@@ -16,7 +16,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="moviesearch.css">
     <title>Movie List</title>
 </head>
 <body>
@@ -41,6 +41,10 @@
 </select>
 
 <button onclick="sortList()">Update</button>
+
+<label for="autocomplete">Search:</label>
+<input type="text" id="autocomplete" name="query" placeholder="Search movies..."><br>
+<button id="searchButton">Search</button>
 
 <!-- Id "star_table" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
 <table id=star_table class="table table-striped">
@@ -69,7 +73,6 @@
 
         // Construct the query string with the new sorting parameter
         let queryString = window.location.search.substring(1);
-        // console.log("yerrrrrr" + queryString);
         let newQueryString = updateQueryStringParameter(queryString, "sorting", sortValue);
         // console.log("yer" + newQueryString);
 
@@ -100,6 +103,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
+
 
 <!-- Load our own JS file -->
 <!-- The path is relative to index.html, since these two files are in the same directory -->
