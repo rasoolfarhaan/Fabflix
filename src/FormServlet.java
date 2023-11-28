@@ -38,12 +38,12 @@ public class FormServlet extends HttpServlet {
         if(request.getParameter("mobile") == null) {
             String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
 
-//            try {
-//                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-//            } catch (Exception e) {
-//                response.getWriter().write("{ \"error\": \"Invalid Captcha!\" }");
-//                return;
-//            }
+            try {
+                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            } catch (Exception e) {
+                response.getWriter().write("{ \"error\": \"Invalid Captcha!\" }");
+                return;
+            }
         }
 
         try(Connection dbCon = dataSource.getConnection()) {
@@ -75,7 +75,11 @@ public class FormServlet extends HttpServlet {
             rs.close();
         } catch (Exception e) {
             request.getServletContext().log("Error: ", e);
-            out.println(String.format("{\"status\":\"\", \"error\":\"error\", \"message\":\"%s\"}", e.getMessage()));
+            if(request.getParameter("mobile") == null) {
+                out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doGet: %s</p></body></html>", e.getMessage()));
+            }else {
+                out.println(String.format("{\"status\":\"\", \"error\":\"error\", \"message\":\"%s\"}", e.getMessage()));
+            }
         } finally {
             out.close();
         }
