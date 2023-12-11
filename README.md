@@ -35,4 +35,5 @@ cs122b-project1-api-example/src/PlaceOrderServlet.java
 Use this command and change the string in file to update files you want to process. 
 “java /path/to/mycs122b-projects/2023-fall-cs122b-hullo/logs/LogWriter.java”
 
+- # JMeter TS/TJ Time Measurement Report
 https://docs.google.com/document/d/1uGcAhmHfGOpIcvvHH0LB4UxkV3EfjwKiaB0VPVyaU7Q/view
