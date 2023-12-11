@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +18,8 @@ import java.sql.ResultSet;
 public class MovieSearchServlet extends HttpServlet {
 
     private DataSource dataSource;
+    private long queryElapsed;
+    private FileWriter querySearchTime;
 
     public void init() {
         try {
@@ -56,12 +59,14 @@ public class MovieSearchServlet extends HttpServlet {
                 statement.setString(1, formattedQuery.toString().trim());
                 System.out.println(statement);
 
-
+                long queryStart = System.nanoTime();
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
                         jsonArray.add(generateJsonObject(rs.getString("id"), rs.getString("title"), rs.getString("director")));
                     }
                 }
+                long queryEnd = System.nanoTime();
+                queryElapsed = queryEnd - queryStart;
             }
 
             response.getWriter().write(jsonArray.toString());
@@ -69,6 +74,12 @@ public class MovieSearchServlet extends HttpServlet {
             System.out.println(e);
             response.sendError(500, e.getMessage());
         }
+
+
+        querySearchTime = new FileWriter("/home/ubuntu/",true);
+        querySearchTime.write(queryElapsed + "\n");
+        querySearchTime.close();
+
     }
 
     private static JsonObject generateJsonObject(String movieId, String title, String director) {
