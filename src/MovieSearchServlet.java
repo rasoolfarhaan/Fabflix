@@ -76,7 +76,7 @@ public class MovieSearchServlet extends HttpServlet {
         }
 
 
-        querySearchTime = new FileWriter("/home/ubuntu/",true);
+        querySearchTime = new FileWriter("/Users/alexhuang/mycs122b-projects/loggg.txt",true);
         querySearchTime.write(queryElapsed + "\n");
         querySearchTime.close();
 
