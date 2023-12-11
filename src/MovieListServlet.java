@@ -15,6 +15,10 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.PreparedStatement;
+
 
 
 // Declaring a WebServlet called MovieListServlet, which maps to url "/api/movies"
@@ -55,91 +59,117 @@ public class MovieListServlet extends HttpServlet {
             String titleStartsWith = request.getParameter("titleStartsWith");
             String sorting = request.getParameter("sorting");
 
-            String sqlQuery = "SELECT \n" +
-                    "m.id AS id, \n" +
-                    "m.title AS title, \n" +
-                    "m.year AS year, \n" +
-                    "m.director AS director, \n" +
-                    "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC) \n" +
-                    " FROM genres g \n" +
-                    " INNER JOIN genres_in_movies gim ON g.id = gim.genreId \n" +
-                    " WHERE gim.movieId = m.id \n" +
-                    " LIMIT 3) AS genres, \n" +
-                    "(SELECT GROUP_CONCAT(concat(s.name,'@',s.id) ORDER BY movieCount DESC, s.name ASC) \n" +
-                    " FROM (SELECT stars.id, stars.name, COUNT(sm.movieId) AS movieCount \n" +
-                    "       FROM stars \n" +
-                    "       INNER JOIN stars_in_movies sm ON stars.id = sm.starId \n" +
-                    "       WHERE sm.movieId = m.id \n" +
-                    "       GROUP BY stars.id, stars.name \n" +
-                    "       ORDER BY movieCount DESC, stars.name ASC \n" +
-                    "       LIMIT 3) AS s) AS stars, \n" +
-                    "COALESCE(r.rating, 'N/A') AS rating \n"+
-                    "FROM movies m \n" +
-                    "LEFT JOIN ratings r ON m.id = r.movieId \n" +
-                    "INNER JOIN genres_in_movies gim ON m.id = gim.movieId\n" +
-                    "INNER JOIN genres g ON gim.genreId = g.id\n"+
-                    "WHERE 1 = 1 ";
+            StringBuilder sqlBuilder = new StringBuilder(
+                    "SELECT " +
+                            "m.id AS id, " +
+                            "m.title AS title, " +
+                            "m.year AS year, " +
+                            "m.director AS director, " +
+                            "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC) " +
+                            " FROM genres g " +
+                            " INNER JOIN genres_in_movies gim ON g.id = gim.genreId " +
+                            " WHERE gim.movieId = m.id " +
+                            " LIMIT 3) AS genres, " +
+                            "(SELECT GROUP_CONCAT(concat(s.name,'@',s.id) ORDER BY movieCount DESC, s.name ASC) " +
+                            " FROM (SELECT stars.id, stars.name, COUNT(sm.movieId) AS movieCount " +
+                            "       FROM stars " +
+                            "       INNER JOIN stars_in_movies sm ON stars.id = sm.starId " +
+                            "       WHERE sm.movieId = m.id " +
+                            "       GROUP BY stars.id, stars.name " +
+                            "       ORDER BY movieCount DESC, stars.name ASC " +
+                            "       LIMIT 3) AS s) AS stars, " +
+                            "COALESCE(r.rating, 'N/A') AS rating " +
+                            "FROM movies m " +
+                            "LEFT JOIN ratings r ON m.id = r.movieId " +
+                            "INNER JOIN genres_in_movies gim ON m.id = gim.movieId " +
+                            "INNER JOIN genres g ON gim.genreId = g.id " +
+                            "WHERE 1 = 1");
 
+// Using StringBuilder for efficient string concatenation
+            List<Object> parameters = new ArrayList<>();
 
-            // Add conditions based on query parameters
             if (title != null && !title.isEmpty()) {
-                sqlQuery += " AND m.title LIKE '%" + title + "%'";
+                sqlBuilder.append(" AND m.title LIKE ?");
+                parameters.add("%" + title + "%");
             }
             if (year != null && !year.isEmpty()) {
-                sqlQuery += " AND m.year = " + year;
+                sqlBuilder.append(" AND m.year = ?");
+                parameters.add(Integer.parseInt(year));
             }
             if (director != null && !director.isEmpty()) {
-                sqlQuery += " AND m.director LIKE '%" + director + "%'";
+                sqlBuilder.append(" AND m.director LIKE ?");
+                parameters.add("%" + director + "%");
             }
             if (star != null && !star.isEmpty()) {
-                sqlQuery += " AND s.name LIKE '%" + star + "%'";
+                sqlBuilder.append(" AND s.name LIKE ?");
+                parameters.add("%" + star + "%");
             }
             if (genre != null && !genre.isEmpty()) {
-                sqlQuery += " AND g.name like '%" + genre + "%'";
+                sqlBuilder.append(" AND g.name LIKE ?");
+                parameters.add("%" + genre + "%");
             }
             if (titleStartsWith != null && !titleStartsWith.isEmpty()) {
                 if (titleStartsWith.equals("*")) {
-                    sqlQuery += " AND m.title REGEXP '^[^a-zA-Z0-9]'";
+                    sqlBuilder.append(" AND m.title REGEXP '^[^a-zA-Z0-9]'");
                 } else {
-                    sqlQuery += " AND m.title LIKE '" + titleStartsWith + "%'";
+                    sqlBuilder.append(" AND m.title LIKE ?");
+                    parameters.add(titleStartsWith + "%");
                 }
             }
+
+            String orderBy = " ORDER BY m.title ASC, rating ASC"; // Default sorting
             if (sorting != null && !sorting.isEmpty()) {
                 switch (sorting) {
                     case "titleAscRatingAsc":
-                        sqlQuery += " ORDER BY m.title ASC, rating ASC";
+                        orderBy = " ORDER BY m.title ASC, rating ASC";
                         break;
                     case "titleAscRatingDesc":
-                        sqlQuery += " ORDER BY m.title ASC, rating DESC";
+                        orderBy = " ORDER BY m.title ASC, rating DESC";
                         break;
                     case "titleDescRatingAsc":
-                        sqlQuery += " ORDER BY m.title DESC, rating ASC";
+                        orderBy = " ORDER BY m.title DESC, rating ASC";
                         break;
                     case "titleDescRatingDesc":
-                        sqlQuery += " ORDER BY m.title DESC, rating DESC";
+                        orderBy = " ORDER BY m.title DESC, rating DESC";
                         break;
                     case "ratingAscTitleAsc":
-                        sqlQuery += " ORDER BY rating ASC, m.title ASC";
+                        orderBy = " ORDER BY rating ASC, m.title ASC";
                         break;
                     case "ratingAscTitleDesc":
-                        sqlQuery += " ORDER BY rating ASC, m.title DESC";
+                        orderBy = " ORDER BY rating ASC, m.title DESC";
                         break;
                     case "ratingDescTitleAsc":
-                        sqlQuery += " ORDER BY rating DESC, m.title ASC";
+                        orderBy = " ORDER BY rating DESC, m.title ASC";
                         break;
                     case "ratingDescTitleDesc":
-                        sqlQuery += " ORDER BY rating DESC, m.title DESC";
+                        orderBy = " ORDER BY rating DESC, m.title DESC";
                         break;
-                    default:
-                        // Default sorting
-                        sqlQuery += " ORDER BY m.title ASC, rating ASC";
                 }
             }
-            sqlQuery += " GROUP BY m.id  ORDER BY m.title ASC, rating ASC LIMIT 20;";
-            System.out.println(sqlQuery);
 
-            // Perform the query
-            ResultSet rs = statement.executeQuery(sqlQuery);
+            sqlBuilder.append(" GROUP BY m.id ");
+            sqlBuilder.append(orderBy);
+            sqlBuilder.append(" LIMIT 20");
+
+            PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString());
+
+            int index = 1;
+            for (Object param : parameters) {
+                if (param instanceof String) {
+                    pstmt.setString(index++, (String) param);
+                } else if (param instanceof Integer) {
+                    pstmt.setInt(index++, (Integer) param);
+                } else if (param instanceof Long) {
+                    pstmt.setLong(index++, (Long) param);
+                } else if (param instanceof Double) {
+                    pstmt.setDouble(index++, (Double) param);
+                } else if (param instanceof Boolean) {
+                    pstmt.setBoolean(index++, (Boolean) param);
+                }
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+
 
             JsonArray jsonArray = new JsonArray();
 
@@ -183,7 +213,8 @@ public class MovieListServlet extends HttpServlet {
                 jsonArray.add(jsonObject);
             }
             rs.close();
-            statement.close();
+            pstmt.close();
+            //statement.close();
             // Log to localhost log
             request.getServletContext().log("getting " + jsonArray.size() + " results");
 
