@@ -48,8 +48,6 @@ https://docs.google.com/document/d/1uGcAhmHfGOpIcvvHH0LB4UxkV3EfjwKiaB0VPVyaU7Q/
 
 | **Scaled Version Test Plan**                   | **Graph Results Screenshot** | **Average Query Time(ms)** | **Average Search Servlet Time(ms)** | **Average JDBC Time(ms)** | **Analysis** |
 |------------------------------------------------|------------------------------|----------------------------|-------------------------------------|---------------------------|--------------|
-| Case 1: HTTP/1 thread                          | logs/graphs/scaled-1-thread.png   |                        | 64                                 | 27                        | 8           | This has a slower query time than the single instance and a faster search time
-| Case 2: HTTP/10 threads                        | logs/graphs/scaled-10-thread.png   |                         | 67                                  | 23                        | 5           | This just has a slower response time on all metrics
+| Case 1: HTTP/1 thread                          | logs/graphs/scaled-1-thread.png                        | 64                                 | 27                        | 8           | This has a slower query time than the single instance and a faster search time
+| Case 2: HTTP/10 threads                        | logs/graphs/scaled-10-thread.png                         | 67                                  | 23                        | 5           | This just has a slower response time on all metrics
 | Case 3: HTTP/10 threads/No connection pooling  | logs/graphs/scaled-no-pooling.png  | 65                         | 30                                  | 7           | No connection pooling has no notable difference
-
-
