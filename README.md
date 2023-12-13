@@ -24,9 +24,13 @@
 - # Master/Slave
     - #### Include the filename/path of all code/configuration files in GitHub of routing queries to Master/Slave SQL.
 master: 54.161.25.219
+
 slave: 54.211.52.253
+
 load-balancer: 3.84.100.162
+
 cs122b-project1-api-example/src/MovieSearchServlet.java
+
 cs122b-project1-api-example/src/PlaceOrderServlet.java
 
     - #### How read/write requests were routed to Master/Slave SQL?
