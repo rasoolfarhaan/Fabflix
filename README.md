@@ -46,7 +46,7 @@ https://docs.google.com/document/d/1uGcAhmHfGOpIcvvHH0LB4UxkV3EfjwKiaB0VPVyaU7Q/
 |------------------------------------------------|------------------------------|----------------------------|-------------------------------------|---------------------------|--------------|
 | Case 1: HTTP/1 thread | ![1 thread 1 instance](logs/graphs/single-1-thread.png)  |  62            | 13                               | 7                  |       The one threaded test had the fastest average query time |
 
-| Case 2: HTTP/10 threads                        | ![10 thread 1 instance](logs/graphs/single-10-thread.png)    |132                        |  34                                 | 14         | The 10 thread test was significantly slower than the 1 threaded test
+| Case 2: HTTP/10 threads                        | ![10 thread 1 instance](logs/graphs/single-10-thread.png)    |132                        |  34                                 | 14         | The 10 thread test was significantly slower than the 1 threaded test|
 | Case 3: HTTPS/10 threads                       | ![Https 10 threads](logs/graphs/single-10-thread-https.png)
    | 133                       | 36                               | 12                      | There is not much difference between the https and http thread times         |
 | Case 4: HTTP/10 threads/No connection pooling  |  ![No pool 1 instance](logs/graphs/single-1-thread-no-pooling.png)  |      136             |31                      | 11          |There is no notable difference in times between all three 10 threads |  
