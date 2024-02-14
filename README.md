@@ -7,8 +7,6 @@
 
     - #### Instruction of deployment: clone, use mvn clean package, move war to tomcat
 
-    - #### Collaborations and Work Distribution: Farhaan worked on Part 1, Alex worked on part 2 and part 3 and 4 was done together.
-
 
 - # Connection Pooling
     - #### Include the filename/path of all code/configuration files in GitHub of using JDBC Connection Pooling.
